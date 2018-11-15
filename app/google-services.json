@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "891297437347",
+    "firebase_url": "https://movb-zadanie.firebaseio.com",
+    "project_id": "movb-zadanie",
+    "storage_bucket": "movb-zadanie.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:891297437347:android:613a2c6a4045c4d5",
+        "android_client_info": {
+          "package_name": "com.example.tomdado.zadanie"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "891297437347-156303cgbitu94b5pr7rccj50ainggdj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8PqJQ-PUPa1fuX1J-YlHy9pJ948AH62g"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
