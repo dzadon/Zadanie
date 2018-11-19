@@ -1,5 +1,6 @@
 package com.example.tomdado.zadanie;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,31 +16,38 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class UserActivity extends AppCompatActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private Button buttonRegister;
+    private Button buttonLogin;
     private EditText editTextEmail;
     private EditText editTextPassword;
-    private TextView textViewSignin;
+    private TextView textViewSignup;
 
-    //private ProgressDialog progressBar;
     private FirebaseAuth firebaseAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user);
+        setContentView(R.layout.activity_login);
+
         firebaseAuth = FirebaseAuth.getInstance();
-        // progressBar = new ProgressBar(this);
-        buttonRegister = findViewById(R.id.buttonRegister);
+
+        if(firebaseAuth.getCurrentUser() != null){
+            //profile acitivity
+            finish();
+            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+        }
+
+        buttonLogin = findViewById(R.id.buttonLogin);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
-        textViewSignin = findViewById(R.id.textViewSignin);
+        textViewSignup = findViewById(R.id.textViewSignup);
 
-        buttonRegister.setOnClickListener(this);
-        textViewSignin.setOnClickListener(this);
+        buttonLogin.setOnClickListener(this);
+        textViewSignup.setOnClickListener(this);
     }
 
-    private void registerUser(){
+    private void userLogin(){
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
@@ -55,14 +63,15 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-        firebaseAuth.createUserWithEmailAndPassword(email,password)
+        firebaseAuth.signInWithEmailAndPassword(email,password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(UserActivity.this,"Registered successfully",Toast.LENGTH_SHORT).show();
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         }else{
-                            Toast.makeText(UserActivity.this,"Could not register",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this,"Could not login",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -71,11 +80,13 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view){
-        if(view == buttonRegister){
-            registerUser();
+        if(view == buttonLogin){
+            userLogin();
         }
-        if(view == textViewSignin){
-            //will open login
+        if(view == textViewSignup){
+            //will open register
+            finish();
+            startActivity(new Intent(this, RegisterActivity.class));
         }
     }
 }
