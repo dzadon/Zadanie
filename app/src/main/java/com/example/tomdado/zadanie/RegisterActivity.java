@@ -15,6 +15,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -24,12 +27,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private TextView textViewSignin;
 
     private FirebaseAuth firebaseAuth;
+    private DatabaseReference mDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         firebaseAuth = FirebaseAuth.getInstance();
-
+        mDatabase = FirebaseDatabase.getInstance().getReference("users");
         if(firebaseAuth.getCurrentUser() != null){
             //profile acitivity
             finish();
@@ -42,6 +47,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         buttonRegister.setOnClickListener(this);
         textViewSignin.setOnClickListener(this);
+    }
+    private void insertToDatabase(){
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        User user = new User("email",0);
+        mDatabase.child(firebaseUser.getUid()).setValue(user);
     }
 
     private void registerUser(){
@@ -65,6 +75,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
+                            insertToDatabase();
                             finish();
                             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         }else{
