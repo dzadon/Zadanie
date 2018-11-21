@@ -16,8 +16,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -27,14 +29,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private TextView textViewSignin;
 
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference mDatabase;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         firebaseAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference("users");
+
         if(firebaseAuth.getCurrentUser() != null){
             //profile acitivity
             finish();
@@ -49,9 +51,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         textViewSignin.setOnClickListener(this);
     }
     private void insertToDatabase(){
+        String email = editTextEmail.getText().toString().trim();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        User user = new User("email",0);
-        mDatabase.child(firebaseUser.getUid()).setValue(user);
+        Map<String, Object> user = new HashMap<>();
+        user.put("email", email);
+        user.put("date", Calendar.getInstance().getTime());
+        user.put("numberOfPosts", 0);
+        db.collection("users").document(firebaseUser.getUid()).set(user);
     }
 
     private void registerUser(){

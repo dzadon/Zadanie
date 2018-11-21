@@ -11,7 +11,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         finish();
-        startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+        startActivity(new Intent(getApplicationContext(), UploadFileActivity.class));
 
     }
 }
