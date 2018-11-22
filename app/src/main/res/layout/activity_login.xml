@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
-
     <LinearLayout
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"

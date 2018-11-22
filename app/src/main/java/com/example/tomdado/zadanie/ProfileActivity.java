@@ -21,7 +21,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.activity_profile);
         textViewProfile = findViewById(R.id.textViewProfile);
         firebaseAuth = FirebaseAuth.getInstance();
-
         buttonLogout = findViewById(R.id.buttonLogout);
 
         if(firebaseAuth.getCurrentUser() == null){
