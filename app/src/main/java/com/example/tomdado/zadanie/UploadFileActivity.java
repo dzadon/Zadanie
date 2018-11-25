@@ -8,9 +8,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,6 +27,13 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.SimpleMultiPartRequest;
 import com.android.volley.toolbox.Volley;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,12 +41,17 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class UploadFileActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private DrawerLayout mDrawerLayout;
     private ImageView imageView;
     private Button buttonChooseFile;
     private Button buttonUpload;
@@ -43,21 +59,86 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
     private Uri fileURI;
     String picturePath = "";
     String urlUpload = "http://mobv.mcomputing.eu/upload/index.php";
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("ACTIVITY","ACTIVITY UPLOAD");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_file);
-
+        setNavigationView();
         imageView = findViewById(R.id.imageView);
         buttonChooseFile = findViewById(R.id.buttonChooseFile);
         buttonUpload = findViewById(R.id.buttonUpload);
         buttonChooseFile.setOnClickListener(this);
         buttonUpload.setOnClickListener(this);
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        if(firebaseAuth.getCurrentUser() == null){
+            //profile acitivity
+            finish();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
+
+        db = FirebaseFirestore.getInstance();
     }
 
     private void openGallery(){
         Intent gallery = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
+    }
+
+    private void updateUser(long numberOfPosts){
+        FirebaseUser firebaseUser= firebaseAuth.getCurrentUser();
+        if(firebaseUser == null){
+            finish();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
+        Log.d("NUMBER OF POSTS",String.valueOf(numberOfPosts));
+        numberOfPosts= numberOfPosts + 1;
+        Map<String, Object> data = new HashMap<>();
+        data.put("numberOfPosts", numberOfPosts);
+        DocumentReference docRef = db.collection("users").document(firebaseUser.getUid());
+        docRef.update(data);
+    }
+
+
+    private void saveToDb(String fileName,String type){
+
+        FirebaseUser firebaseUser= firebaseAuth.getCurrentUser();
+        if(firebaseUser == null){
+            finish();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
+        DocumentReference docRef = db.collection("users").document(firebaseUser.getUid());
+
+        Map<String, Object> post = new HashMap<>();
+        post.put("username", firebaseUser.getEmail());
+        post.put("date", Calendar.getInstance().getTime() );
+        post.put("userid", firebaseUser.getUid());
+        post.put("imageurl", fileName);
+        post.put("type",type);
+        db.collection("posts").add(post);
+
+        docRef.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()){
+                            Crashlytics.log("UploadFile activity - document exists");
+                            Long numberOfPosts = documentSnapshot.getLong("numberOfPosts");
+                           updateUser(numberOfPosts);
+                        }else{
+                            Crashlytics.log("UploadFile activity - document doesnt exist");
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Crashlytics.logException(e);
+                    }
+                });
     }
 
     private void uploadFile(){
@@ -76,10 +157,13 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                             JSONObject jObj = new JSONObject(response);
                             String status = jObj.getString("status");
                             Toast.makeText(getApplicationContext(), "resp: " + response, Toast.LENGTH_LONG).show();
-
                             Crashlytics.log("Upload file " + "response: " + response);
+
+                            //TODO teraz sa to robi vzdy
+                            saveToDb("testName","image");
                             if (status.equals("ok")) {
                                 //ulozit do DB
+                                //saveToDb(jObj.getString("message"),"image");
                                 Toast.makeText(getApplicationContext(), "ok: " + response, Toast.LENGTH_LONG).show();
                             }
                         }
@@ -119,20 +203,6 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-   /* @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
-        if(resultCode == RESULT_OK && requestCode == PICK_IMAGE){
-            fileURI = data.getData();
-            imageView.setImageURI(fileURI);
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),fileURI);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -157,6 +227,23 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
             result = "Not found";
         }
         return result;
+    }
+
+    private void setNavigationView(){
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        SwitchClass switchClass = new SwitchClass();
+                        finish();
+                        startActivity(new Intent(getApplicationContext(),switchClass.getActivity(menuItem.getItemId())));
+                        menuItem.setChecked(true);
+                        mDrawerLayout.closeDrawers();
+                        return true;
+                    }
+                });
     }
 
 
