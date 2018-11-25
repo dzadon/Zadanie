@@ -7,6 +7,5 @@
         <item
             android:id="@+id/navProfile"
             android:title="Profile" />
-
     </group>
 </menu>
