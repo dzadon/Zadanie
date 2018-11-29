@@ -17,11 +17,11 @@
         android:fitsSystemWindows="true">
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textViewProfile"
@@ -34,27 +34,31 @@
                 android:id="@+id/textViewName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="center_horizontal" />
 
             <TextView
                 android:id="@+id/textViewRegDatetime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="center_horizontal" />
 
             <TextView
                 android:id="@+id/textViewNumberOfPosts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="center_horizontal" />
 
             <Button
-                android:layout_margin="15dp"
                 android:id="@+id/buttonLogout"
-                android:text="Logout"
+                android:textSize="20sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="15dp"
+                android:background="@drawable/logout_button_shape"
+                android:fadingEdge="none|horizontal|vertical"
+                android:text="Logout" />
+
 
         </LinearLayout>
 
