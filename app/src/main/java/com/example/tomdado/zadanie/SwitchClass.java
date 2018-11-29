@@ -11,6 +11,9 @@ public class SwitchClass {
             case R.id.navUploadFile:
                 cls = UploadFileActivity.class;
                 break;
+            case R.id.navPosts:
+                cls = MainActivity.class;
+                break;
             default:
                 cls = ProfileActivity.class;
                 break;

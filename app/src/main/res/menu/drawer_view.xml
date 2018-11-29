@@ -7,5 +7,8 @@
         <item
             android:id="@+id/navProfile"
             android:title="Profile" />
+        <item
+            android:id="@+id/navPosts"
+            android:title="Posts" />
     </group>
 </menu>
