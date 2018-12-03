@@ -4,7 +4,6 @@ package com.example.tomdado.zadanie;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,12 +18,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.error.VolleyError;
-import com.android.volley.request.SimpleMultiPartRequest;
-import com.android.volley.toolbox.Volley;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,17 +26,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -148,7 +134,7 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
             Crashlytics.log("Upload Error. " + "Video not found.");
             return;
         }
-
+/*
         SimpleMultiPartRequest smr = new SimpleMultiPartRequest(Request.Method.POST, urlUpload,
                 new Response.Listener<String>() {
                     @Override
@@ -181,13 +167,48 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                         Crashlytics.logException(error);
                     }
                 }
-        );
+        ) {
+           @Override
+            public String getBodyContentType()
+            {
+                Log.d("BodyContent","changing BodyContent");
+                return "image/jpeg";
+            }
 
+        };
+
+        //smr.getBodyContentType();
+       // smr.addMultipartParam("upfile","image/jpeg",picturePath);
         smr.addFile("upfile", picturePath);
         RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext());
         mRequestQueue.add(smr);
+*/
+
+
+        Ion.with(UploadFileActivity.this)
+                .load("POST",urlUpload)
+                .setMultipartFile("upfile", "image/jpeg", uploadVideo)
+                .asString()
+                .setCallback(new FutureCallback<String>() {
+                    @Override
+                    public void onCompleted(Exception e, String result) {
+                        if (result != null) {
+                            Crashlytics.log("Upload file " + "response: " + result);
+                            Toast.makeText(getApplicationContext(), "success: " + result, Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            Crashlytics.logException(e);
+                        }
+                    }
+                });
+
+
+
+
 
     }
+
+
 
     @Override
     public void onClick(View view){
