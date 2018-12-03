@@ -4,7 +4,10 @@ package com.example.tomdado.zadanie;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -14,10 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,11 +34,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class UploadFileActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -47,6 +54,8 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
     String urlUpload = "http://mobv.mcomputing.eu/upload/index.php";
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore db;
+    String mimeType = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("ACTIVITY","ACTIVITY UPLOAD");
@@ -71,7 +80,9 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
 
     private void openGallery(){
         Intent gallery = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        startActivityForResult(gallery, PICK_IMAGE);
+        gallery.setType("video/*, image/*");
+        gallery.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"image/*", "video/*"});
+        startActivityForResult(gallery,1);
     }
 
     private void updateUser(long numberOfPosts){
@@ -90,7 +101,6 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
 
 
     private void saveToDb(String fileName,String type){
-
         FirebaseUser firebaseUser= firebaseAuth.getCurrentUser();
         if(firebaseUser == null){
             finish();
@@ -128,29 +138,37 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void uploadFile(){
+        mimeType = getMimeType(picturePath);
         File uploadVideo = new File(picturePath);
         if(!uploadVideo.exists()){
             Toast.makeText(getApplicationContext(), "upload err: " + picturePath, Toast.LENGTH_LONG).show();
             Crashlytics.log("Upload Error. " + "Video not found.");
             return;
         }
-/*
-        SimpleMultiPartRequest smr = new SimpleMultiPartRequest(Request.Method.POST, urlUpload,
-                new Response.Listener<String>() {
+
+        Ion.with(UploadFileActivity.this)
+                .load("POST",urlUpload)
+                .setMultipartFile("upfile", mimeType, uploadVideo)
+                .asString()
+                .setCallback(new FutureCallback<String>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onCompleted(Exception ex, String response) {
                         try {
                             JSONObject jObj = new JSONObject(response);
                             String status = jObj.getString("status");
                             Toast.makeText(getApplicationContext(), "resp: " + response, Toast.LENGTH_LONG).show();
                             Crashlytics.log("Upload file " + "response: " + response);
-
-                            //TODO teraz sa to robi vzdy
-                            saveToDb("testName","image");
                             if (status.equals("ok")) {
                                 //ulozit do DB
-                                //saveToDb(jObj.getString("message"),"image");
-                                Toast.makeText(getApplicationContext(), "ok: " + response, Toast.LENGTH_LONG).show();
+                                if(!switchMimeType(mimeType).equals("")){
+                                    saveToDb(jObj.getString("message"),switchMimeType(mimeType));
+                                    Toast.makeText(getApplicationContext(), "ok: " + response, Toast.LENGTH_LONG).show();
+                                }
+                                else {
+                                    Crashlytics.log("Nepodporovany typ suboru");
+                                    Toast.makeText(getApplicationContext(), "Nepodporovany typ suboru", Toast.LENGTH_LONG).show();
+                                }
+
                             }
                         }
                         catch(JSONException e) {
@@ -159,53 +177,7 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                             Toast.makeText(getApplicationContext(), "JSON error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "err: " + error, Toast.LENGTH_LONG).show();
-                        Crashlytics.logException(error);
-                    }
-                }
-        ) {
-           @Override
-            public String getBodyContentType()
-            {
-                Log.d("BodyContent","changing BodyContent");
-                return "image/jpeg";
-            }
-
-        };
-
-        //smr.getBodyContentType();
-       // smr.addMultipartParam("upfile","image/jpeg",picturePath);
-        smr.addFile("upfile", picturePath);
-        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext());
-        mRequestQueue.add(smr);
-*/
-
-
-        Ion.with(UploadFileActivity.this)
-                .load("POST",urlUpload)
-                .setMultipartFile("upfile", "image/jpeg", uploadVideo)
-                .asString()
-                .setCallback(new FutureCallback<String>() {
-                    @Override
-                    public void onCompleted(Exception e, String result) {
-                        if (result != null) {
-                            Crashlytics.log("Upload file " + "response: " + result);
-                            Toast.makeText(getApplicationContext(), "success: " + result, Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(getApplicationContext(), "error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            Crashlytics.logException(e);
-                        }
-                    }
                 });
-
-
-
-
-
     }
 
 
@@ -219,8 +191,8 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
             try {
                 uploadFile();
             }catch (Exception e) {
+                Crashlytics.logException(e);
             }
-
         }
     }
 
@@ -229,8 +201,23 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
         if (resultCode == RESULT_OK) {
             fileURI = data.getData( );
             picturePath = getPath( getApplicationContext( ), fileURI );
-            imageView.setImageURI(fileURI);
-            Log.d("Picture Path", picturePath);
+            mimeType = getMimeType(picturePath);
+
+            if(!switchMimeType(mimeType).equals("")){
+                if(switchMimeType(mimeType).equals("video")){
+                    Glide.with(getApplicationContext())
+                            .load(picturePath) // or URI/path
+                            .into(imageView); //imageview to set thumbnail to
+                }
+                else {
+                    imageView.setImageURI(fileURI);
+                }
+            }
+            else {
+                Crashlytics.log("Nepodporovany typ suboru");
+                Toast.makeText(getApplicationContext(), "Nepodporovany typ suboru", Toast.LENGTH_LONG).show();
+            }
+
         }
     }
     public static String getPath(Context context, Uri uri ) {
@@ -267,5 +254,50 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                 });
     }
 
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
 
+    public String switchMimeType(String mimeType){
+        switch(mimeType){
+            case "image/jpeg":
+                return "image";
+            case "image/png":
+                return "image";
+            case "video/mp4":
+                return "video";
+        }
+        return "";
+    }
+
+    public static Bitmap retriveVideoFrameFromVideo(String videoPath)
+            throws Throwable {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever mediaMetadataRetriever = null;
+        try {
+            mediaMetadataRetriever = new MediaMetadataRetriever();
+            if (Build.VERSION.SDK_INT >= 14)
+                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
+            else
+                mediaMetadataRetriever.setDataSource(videoPath);
+
+            bitmap = mediaMetadataRetriever.getFrameAtTime(1, MediaMetadataRetriever.OPTION_CLOSEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Throwable(
+                    "Exception in retriveVideoFrameFromVideo(String videoPath)"
+                            + e.getMessage());
+
+        } finally {
+            if (mediaMetadataRetriever != null) {
+                mediaMetadataRetriever.release();
+            }
+        }
+        return bitmap;
+    }
 }
