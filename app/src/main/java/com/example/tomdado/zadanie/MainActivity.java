@@ -30,7 +30,7 @@ import android.Manifest;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -73,12 +73,12 @@ public class MainActivity extends AppCompatActivity {
     private void createData() {
         final List<SingleItemModel> posts = new ArrayList<>();
         final Map<String,SingleItemModel> authors = new HashMap<>();
-
         db.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+                    List<DocumentSnapshot> myListOfDocuments = task.getResult().getDocuments();
+                    for (DocumentSnapshot document : myListOfDocuments) {
                         SingleItemModel item = new SingleItemModel();
                         item.setProfileView(true);
                         item.setAuthor(document.getString("email"));
@@ -98,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+                    List<DocumentSnapshot> myListOfDocuments = task.getResult().getDocuments();
+                    for (DocumentSnapshot document : myListOfDocuments) {
                         SingleItemModel item = new SingleItemModel();
                         item.setProfileView(false);
                         item.setUrl(document.getString("imageurl"));
@@ -114,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        Toast.makeText(this, "posts  '" + posts.size() , Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "authors  '" + authors.size() , Toast.LENGTH_LONG).show();
         for (SingleItemModel post : posts){
             SectionDataModel dm = new SectionDataModel();
             ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();
