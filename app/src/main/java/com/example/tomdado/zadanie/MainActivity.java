@@ -25,12 +25,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import android.Manifest;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -70,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void createData() {
+    private void createData() throws ExecutionException, InterruptedException {
         final List<SingleItemModel> posts = new ArrayList<>();
         final Map<String,SingleItemModel> authors = new HashMap<>();
-        db.collection("users").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
+       /* db.collection("users").get();.addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
             @Override
             public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
                 for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
@@ -87,41 +90,68 @@ public class MainActivity extends AppCompatActivity {
                     item.setNumberOfPosts(Long.toString(document.getLong("numberOfPosts")));
                     authors.put(document.getString("email"),item);
                 }
+            }
+        });*/
 
-                db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
-                    @Override
-                    public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
-                        for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
-                            SingleItemModel item = new SingleItemModel();
-                            item.setProfileView(false);
-                            item.setUrl(document.getString("imageurl"));
-                            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                            Date date = document.getTimestamp("date").toDate();
-                            String datetime =  df.format(date);
-                            item.setDateTimeOfPost(datetime);
-                            item.setAuthor(document.getString("username"));
-                            posts.add(item);
-                        }
+        final QuerySnapshot querySnapshot = Tasks.await(db.collection("users").get());
+        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+            SingleItemModel item = new SingleItemModel();
+            item.setProfileView(true);
+            item.setAuthor(document.getString("email"));
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+            Date date = document.getTimestamp("date").toDate();
+            String datetime =  df.format(date);
+            item.setDateTimeOfRegistration(datetime);
+            item.setNumberOfPosts(Long.toString(document.getLong("numberOfPosts")));
+            authors.put(document.getString("email"),item);
+        }
 
-                        for (SingleItemModel post : posts){
-                            SectionDataModel dm = new SectionDataModel();
-                            ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();
-
-                            singleItemModels.add(authors.get(post.getAuthor()));
-                            for (SingleItemModel post2 : posts){
-                                if(post2.getAuthor().equals(post.getAuthor())){
-                                    singleItemModels.add(post2);
-                                }
-                            }
-                            dm.setAllItemInSection(singleItemModels);
-                            allSampleData.add(dm);
-                        }
-
-                    }
-                });
-
+/*
+        db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
+            @Override
+            public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
+                for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
+                    SingleItemModel item = new SingleItemModel();
+                    item.setProfileView(false);
+                    item.setUrl(document.getString("imageurl"));
+                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                    Date date = document.getTimestamp("date").toDate();
+                    String datetime =  df.format(date);
+                    item.setDateTimeOfPost(datetime);
+                    item.setAuthor(document.getString("username"));
+                    posts.add(item);
+                }
             }
         });
+*/
+        final QuerySnapshot querySnapshot2 = Tasks.await( db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get());
+        for (DocumentSnapshot document : querySnapshot2.getDocuments()) {
+            SingleItemModel item = new SingleItemModel();
+            item.setProfileView(false);
+            item.setUrl(document.getString("imageurl"));
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+            Date date = document.getTimestamp("date").toDate();
+            String datetime =  df.format(date);
+            item.setDateTimeOfPost(datetime);
+            item.setAuthor(document.getString("username"));
+            posts.add(item);
+        }
+
+        Toast.makeText(this, "posts  '" + posts.size() , Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "authors  '" + authors.size() , Toast.LENGTH_LONG).show();
+        for (SingleItemModel post : posts){
+            SectionDataModel dm = new SectionDataModel();
+            ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();
+
+            singleItemModels.add(authors.get(post.getAuthor()));
+            for (SingleItemModel post2 : posts){
+                if(post2.getAuthor().equals(post.getAuthor())){
+                    singleItemModels.add(post2);
+                }
+            }
+            dm.setAllItemInSection(singleItemModels);
+            allSampleData.add(dm);
+        }
     }
 
 
