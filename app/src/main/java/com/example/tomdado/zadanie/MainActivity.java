@@ -87,41 +87,42 @@ public class MainActivity extends AppCompatActivity {
                     item.setNumberOfPosts(Long.toString(document.getLong("numberOfPosts")));
                     authors.put(document.getString("email"),item);
                 }
+
+                db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
+                    @Override
+                    public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
+                            SingleItemModel item = new SingleItemModel();
+                            item.setProfileView(false);
+                            item.setUrl(document.getString("imageurl"));
+                            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                            Date date = document.getTimestamp("date").toDate();
+                            String datetime =  df.format(date);
+                            item.setDateTimeOfPost(datetime);
+                            item.setAuthor(document.getString("username"));
+                            posts.add(item);
+                        }
+
+                        for (SingleItemModel post : posts){
+                            SectionDataModel dm = new SectionDataModel();
+                            ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();
+
+                            singleItemModels.add(authors.get(post.getAuthor()));
+                            for (SingleItemModel post2 : posts){
+                                if(post2.getAuthor().equals(post.getAuthor())){
+                                    singleItemModels.add(post2);
+                                }
+                            }
+                            dm.setAllItemInSection(singleItemModels);
+                            allSampleData.add(dm);
+                        }
+
+                    }
+                });
+
             }
         });
 
-        db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
-            @Override
-            public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
-                for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
-                    SingleItemModel item = new SingleItemModel();
-                    item.setProfileView(false);
-                    item.setUrl(document.getString("imageurl"));
-                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                    Date date = document.getTimestamp("date").toDate();
-                    String datetime =  df.format(date);
-                    item.setDateTimeOfPost(datetime);
-                    item.setAuthor(document.getString("username"));
-                    posts.add(item);
-                }
-            }
-        });
-
-        Toast.makeText(this, "posts  '" + posts.size() , Toast.LENGTH_LONG).show();
-        Toast.makeText(this, "authors  '" + authors.size() , Toast.LENGTH_LONG).show();
-        for (SingleItemModel post : posts){
-            SectionDataModel dm = new SectionDataModel();
-            ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();
-
-            singleItemModels.add(authors.get(post.getAuthor()));
-            for (SingleItemModel post2 : posts){
-                if(post2.getAuthor().equals(post.getAuthor())){
-                    singleItemModels.add(post2);
-                }
-            }
-            dm.setAllItemInSection(singleItemModels);
-            allSampleData.add(dm);
-        }
     }
 
 
