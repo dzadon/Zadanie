@@ -29,8 +29,8 @@ import java.util.Map;
 import android.Manifest;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -73,45 +73,36 @@ public class MainActivity extends AppCompatActivity {
     private void createData() {
         final List<SingleItemModel> posts = new ArrayList<>();
         final Map<String,SingleItemModel> authors = new HashMap<>();
-        db.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection("users").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<DocumentSnapshot> myListOfDocuments = task.getResult().getDocuments();
-                    for (DocumentSnapshot document : myListOfDocuments) {
-                        SingleItemModel item = new SingleItemModel();
-                        item.setProfileView(true);
-                        item.setAuthor(document.getString("email"));
-                        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                        Date date = document.getTimestamp("date").toDate();
-                        String datetime =  df.format(date);
-                        item.setDateTimeOfRegistration(datetime);
-                        item.setNumberOfPosts(Long.toString(document.getLong("numberOfPosts")));
-                        authors.put(document.getString("email"),item);                    }
-                } else {
-                    Log.d("create data", "Error getting documents: ", task.getException());
+            public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
+                for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
+                    SingleItemModel item = new SingleItemModel();
+                    item.setProfileView(true);
+                    item.setAuthor(document.getString("email"));
+                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                    Date date = document.getTimestamp("date").toDate();
+                    String datetime =  df.format(date);
+                    item.setDateTimeOfRegistration(datetime);
+                    item.setNumberOfPosts(Long.toString(document.getLong("numberOfPosts")));
+                    authors.put(document.getString("email"),item);
                 }
             }
         });
 
-        db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<DocumentSnapshot> myListOfDocuments = task.getResult().getDocuments();
-                    for (DocumentSnapshot document : myListOfDocuments) {
-                        SingleItemModel item = new SingleItemModel();
-                        item.setProfileView(false);
-                        item.setUrl(document.getString("imageurl"));
-                        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                        Date date = document.getTimestamp("date").toDate();
-                        String datetime =  df.format(date);
-                        item.setDateTimeOfPost(datetime);
-                        item.setAuthor(document.getString("username"));
-                        posts.add(item);
-                    }
-                } else {
-                    Log.d("create data", "Error getting documents: ", task.getException());
+            public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
+                for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
+                    SingleItemModel item = new SingleItemModel();
+                    item.setProfileView(false);
+                    item.setUrl(document.getString("imageurl"));
+                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                    Date date = document.getTimestamp("date").toDate();
+                    String datetime =  df.format(date);
+                    item.setDateTimeOfPost(datetime);
+                    item.setAuthor(document.getString("username"));
+                    posts.add(item);
                 }
             }
         });
