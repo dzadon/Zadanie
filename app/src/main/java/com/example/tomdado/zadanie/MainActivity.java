@@ -17,10 +17,24 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import android.Manifest;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,16 +45,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
            Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        db = FirebaseFirestore.getInstance();
         Log.d("ACTIVITY","ACTIVITY MAIN");
         checkPermissions();
-
         setNavigationView();
-
         allSampleData = new ArrayList<>();
         createData();
 
@@ -55,7 +69,68 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     private void createData() {
+        final List<SingleItemModel> posts = new ArrayList<>();
+        final Map<String,SingleItemModel> authors = new HashMap<>();
+
+        db.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        SingleItemModel item = new SingleItemModel();
+                        item.setProfileView(true);
+                        item.setAuthor(document.getString("email"));
+                        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                        Date date = document.getTimestamp("date").toDate();
+                        String datetime =  df.format(date);
+                        item.setDateTimeOfRegistration(datetime);
+                        item.setNumberOfPosts(Long.toString(document.getLong("numberOfPosts")));
+                        authors.put(document.getString("email"),item);                    }
+                } else {
+                    Log.d("create data", "Error getting documents: ", task.getException());
+                }
+            }
+        });
+
+        db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        SingleItemModel item = new SingleItemModel();
+                        item.setProfileView(false);
+                        item.setUrl(document.getString("imageurl"));
+                        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                        Date date = document.getTimestamp("date").toDate();
+                        String datetime =  df.format(date);
+                        item.setDateTimeOfPost(datetime);
+                        item.setAuthor(document.getString("username"));
+                        posts.add(item);
+                    }
+                } else {
+                    Log.d("create data", "Error getting documents: ", task.getException());
+                }
+            }
+        });
+        for (SingleItemModel post : posts){
+            SectionDataModel dm = new SectionDataModel();
+            ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();
+
+            singleItemModels.add(authors.get(post.getAuthor()));
+            for (SingleItemModel post2 : posts){
+                if(post2.getAuthor().equals(post.getAuthor())){
+                    singleItemModels.add(post2);
+                }
+            }
+            dm.setAllItemInSection(singleItemModels);
+            allSampleData.add(dm);
+        }
+    }
+
+
+    private void createData2() {
         for (int i = 1; i <= 20; i++) {
             SectionDataModel dm = new SectionDataModel();
             ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();

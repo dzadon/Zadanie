@@ -48,7 +48,6 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
     private ImageView imageView;
     private Button buttonChooseFile;
     private Button buttonUpload;
-    private static final int PICK_IMAGE = 100;
     private Uri fileURI;
     String picturePath = "";
     String urlUpload = "http://mobv.mcomputing.eu/upload/index.php";
@@ -179,7 +178,6 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                     }
                 });
     }
-
 
 
     @Override
