@@ -119,8 +119,9 @@ public class MainActivity extends AppCompatActivity {
                             ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();
 
                             singleItemModels.add(authors.get(post.getAuthor()));
+                            singleItemModels.add(post);
                             for (SingleItemModel post2 : posts){
-                                if(post2.getAuthor().equals(post.getAuthor())){
+                                if(!post2.equals(post) && post2.getAuthor().equals(post.getAuthor())){
                                     singleItemModels.add(post2);
                                 }
                             }
