@@ -73,8 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 snapHelper.attachToRecyclerView(recyclerView);
                 recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                     @Override
-                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                         RecyclerViewDataAdapter adapter = (RecyclerViewDataAdapter)recyclerView.getAdapter();
                         adapter.scroll();
                     }
