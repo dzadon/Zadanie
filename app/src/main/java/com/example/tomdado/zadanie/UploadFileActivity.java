@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,6 +34,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -208,7 +210,16 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                             .into(imageView); //imageview to set thumbnail to
                 }
                 else {
-                    imageView.setImageURI(fileURI);
+                    //imageView.setImageURI(fileURI);
+                    //Picasso.get().load(fileURI).fit().centerCrop().into(imageView);
+                    Glide.with(getApplicationContext())
+                            .load(fileURI) // or URI/path
+                            .apply(new RequestOptions()
+                                .fitCenter()
+                                .centerCrop()
+                            )
+                            .into(imageView);
+
                 }
             }
             else {
@@ -271,31 +282,5 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                 return "video";
         }
         return "";
-    }
-
-    public static Bitmap retriveVideoFrameFromVideo(String videoPath)
-            throws Throwable {
-        Bitmap bitmap = null;
-        MediaMetadataRetriever mediaMetadataRetriever = null;
-        try {
-            mediaMetadataRetriever = new MediaMetadataRetriever();
-            if (Build.VERSION.SDK_INT >= 14)
-                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
-            else
-                mediaMetadataRetriever.setDataSource(videoPath);
-
-            bitmap = mediaMetadataRetriever.getFrameAtTime(1, MediaMetadataRetriever.OPTION_CLOSEST);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Throwable(
-                    "Exception in retriveVideoFrameFromVideo(String videoPath)"
-                            + e.getMessage());
-
-        } finally {
-            if (mediaMetadataRetriever != null) {
-                mediaMetadataRetriever.release();
-            }
-        }
-        return bitmap;
     }
 }

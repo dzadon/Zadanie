@@ -10,6 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListDataAdapter.SingleItemRowHolder>{
@@ -48,9 +52,15 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
             holder.postTextViewRegDatetime.setText("DateTime of registration " + itemModel.getDateTimeOfRegistration());
             holder.postTextViewNumberOfPosts.setText("Number of posts " + itemModel.getNumberOfPosts());
         } else {
-            holder.postAuthor.setText("Author: " + itemModel.getAuthor());
-            holder.postTime.setText("DateTime " + itemModel.getDateTimeOfPost());
-            holder.imageView_post.setImageURI(Uri.parse("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()));
+            holder.postAuthor.setText("Autor: " + itemModel.getAuthor());
+            holder.postTime.setText("Dátum a čas: " + itemModel.getDateTimeOfPost());
+            Glide.with(mContext)
+                    .load("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()) // or URI/path
+                    .apply(new RequestOptions()
+                            .fitCenter()
+                            .centerCrop()
+                    )
+                    .into(holder.imageView_post);
         }
     }
 
