@@ -1,6 +1,7 @@
 package com.example.tomdado.zadanie;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,10 +50,8 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
         } else {
             holder.postAuthor.setText("Author: " + itemModel.getAuthor());
             holder.postTime.setText("DateTime " + itemModel.getDateTimeOfPost());
-            //TODO imageView
-            //holder.imageView_post.setImageURI(itemModel.getUrl());
+            holder.imageView_post.setImageURI(Uri.parse("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()));
         }
-
     }
 
     // determine which layout to use for the row

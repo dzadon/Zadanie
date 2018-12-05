@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
            Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     private FirebaseFirestore db;
+    final List<SingleItemModel> posts = new ArrayList<>();
+    final Map<String,SingleItemModel> authors = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,23 +58,88 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
         setNavigationView();
         allSampleData = new ArrayList<>();
-        createData();
+       // createData();
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        RecyclerViewDataAdapter adapter = new RecyclerViewDataAdapter(allSampleData, this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recyclerView.setAdapter(adapter);
-        SnapHelper snapHelper = new PagerSnapHelper();
-        recyclerView.setOnFlingListener(null);
-        snapHelper.attachToRecyclerView(recyclerView);
+        readData(new FirestoreCallback() {
+            @Override
+            public void onCallback(ArrayList<SectionDataModel> list) {
+                allSampleData = list;
+                Log.d("SAMPLE DATA", allSampleData.toString());
+                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+                recyclerView.setHasFixedSize(true);
+                RecyclerViewDataAdapter adapter = new RecyclerViewDataAdapter(allSampleData, getApplicationContext());
+                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
+                recyclerView.setAdapter(adapter);
+                SnapHelper snapHelper = new PagerSnapHelper();
+                recyclerView.setOnFlingListener(null);
+                snapHelper.attachToRecyclerView(recyclerView);
+            }
+        });
+
 
     }
 
+    public interface FirestoreCallback {
+        void onCallback(ArrayList<SectionDataModel> list);
+    }
 
+
+    private void readData(final FirestoreCallback firestoreCallback){
+        db.collection("users").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
+            @Override
+            public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
+                for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
+                    SingleItemModel item = new SingleItemModel();
+                    item.setProfileView(true);
+                    item.setAuthor(document.getString("email"));
+                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                    Date date = document.getTimestamp("date").toDate();
+                    String datetime =  df.format(date);
+                    item.setDateTimeOfRegistration(datetime);
+                    item.setNumberOfPosts(Long.toString(document.getLong("numberOfPosts")));
+                    authors.put(document.getString("email"),item);
+                }
+                db.collection("posts").orderBy("date",Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
+                    @Override
+                    public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
+                            SingleItemModel item = new SingleItemModel();
+                            item.setProfileView(false);
+                            item.setUrl(document.getString("imageurl"));
+                            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                            Date date = document.getTimestamp("date").toDate();
+                            String datetime =  df.format(date);
+                            item.setDateTimeOfPost(datetime);
+                            item.setAuthor(document.getString("username"));
+                            posts.add(item);
+                        }
+
+                        for (SingleItemModel post : posts){
+                            SectionDataModel dm = new SectionDataModel();
+                            ArrayList<SingleItemModel> singleItemModels = new ArrayList<>();
+
+                            singleItemModels.add(authors.get(post.getAuthor()));
+                            for (SingleItemModel post2 : posts){
+                                if(post2.getAuthor().equals(post.getAuthor())){
+                                    singleItemModels.add(post2);
+                                }
+                            }
+                            dm.setAllItemInSection(singleItemModels);
+                            allSampleData.add(dm);
+                        }
+                        firestoreCallback.onCallback(allSampleData);
+                    }
+                });
+
+
+            }
+        });
+
+    }
+
+/*
     private void createData() {
-        final List<SingleItemModel> posts = new ArrayList<>();
-        final Map<String,SingleItemModel> authors = new HashMap<>();
+
         db.collection("users").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>(){
             @Override
             public void onSuccess(QuerySnapshot QueryDocumentSnapshots) {
@@ -122,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
             dm.setAllItemInSection(singleItemModels);
             allSampleData.add(dm);
         }
-    }
+    }*/
 
 
     private void createData2() {
