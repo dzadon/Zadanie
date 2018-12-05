@@ -71,6 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 SnapHelper snapHelper = new PagerSnapHelper();
                 recyclerView.setOnFlingListener(null);
                 snapHelper.attachToRecyclerView(recyclerView);
+                recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                        RecyclerViewDataAdapter adapter = (RecyclerViewDataAdapter)recyclerView.getAdapter();
+                        adapter.scroll();
+                    }
+                });
             }
         });
 

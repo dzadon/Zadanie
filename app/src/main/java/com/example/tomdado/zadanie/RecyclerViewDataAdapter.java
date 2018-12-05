@@ -19,6 +19,7 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
     private ArrayList<SectionDataModel> dataList;
     private Context mContext;
     private RecyclerView.RecycledViewPool recycledViewPool;
+    private ItemRowHolder rowHolder;
 
     public RecyclerViewDataAdapter(ArrayList<SectionDataModel> dataList, Context mContext) {
         this.dataList = dataList;
@@ -26,16 +27,19 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
         recycledViewPool = new RecyclerView.RecycledViewPool();
     }
 
+    public void scroll(){
+        rowHolder.recyclerView.scrollToPosition(1);
+    }
+
     @Override
     public ItemRowHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        ItemRowHolder rowHolder = new ItemRowHolder(v);
+        rowHolder = new ItemRowHolder(v);
         return rowHolder;
     }
 
     @Override
     public void onBindViewHolder(ItemRowHolder holder, int position) {
-        position = 1;
         ArrayList singleSectionItems = dataList.get(position).getAllItemInSection();
         SectionListDataAdapter adapter = new SectionListDataAdapter(singleSectionItems, mContext);
         holder.recyclerView.setHasFixedSize(true);
