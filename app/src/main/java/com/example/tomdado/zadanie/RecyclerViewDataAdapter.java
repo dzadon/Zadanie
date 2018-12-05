@@ -35,6 +35,7 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
 
     @Override
     public void onBindViewHolder(ItemRowHolder holder, int position) {
+        position = 1;
         ArrayList singleSectionItems = dataList.get(position).getAllItemInSection();
         SectionListDataAdapter adapter = new SectionListDataAdapter(singleSectionItems, mContext);
         holder.recyclerView.setHasFixedSize(true);
