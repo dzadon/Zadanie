@@ -19,7 +19,6 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
     private ArrayList<SectionDataModel> dataList;
     private Context mContext;
     private RecyclerView.RecycledViewPool recycledViewPool;
-    private ItemRowHolder rowHolder;
 
     public RecyclerViewDataAdapter(ArrayList<SectionDataModel> dataList, Context mContext) {
         this.dataList = dataList;
@@ -27,14 +26,10 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
         recycledViewPool = new RecyclerView.RecycledViewPool();
     }
 
-    public void scroll(){
-        rowHolder.recyclerView.scrollToPosition(1);
-    }
-
     @Override
     public ItemRowHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        rowHolder = new ItemRowHolder(v);
+        ItemRowHolder rowHolder = new ItemRowHolder(v);
         return rowHolder;
     }
 

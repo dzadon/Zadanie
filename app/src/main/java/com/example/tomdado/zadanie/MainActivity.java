@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     final List<SingleItemModel> posts = new ArrayList<>();
     final Map<String,SingleItemModel> authors = new HashMap<>();
-    private RecyclerViewDataAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,22 +65,12 @@ public class MainActivity extends AppCompatActivity {
                 allSampleData = list;
                 RecyclerView recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
                 recyclerView.setHasFixedSize(true);
-                adapter = new RecyclerViewDataAdapter(allSampleData, getApplicationContext());
+                RecyclerViewDataAdapter adapter = new RecyclerViewDataAdapter(allSampleData, getApplicationContext());
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false));
                 recyclerView.setAdapter(adapter);
                 SnapHelper snapHelper = new PagerSnapHelper();
                 recyclerView.setOnFlingListener(null);
                 snapHelper.attachToRecyclerView(recyclerView);
-                recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-                        if(newState ==RecyclerView.SCROLL_STATE_SETTLING){
-                            RecyclerViewDataAdapter adapter = (RecyclerViewDataAdapter)recyclerView.getAdapter();
-                            adapter.scroll();
-                        }
-                    }
-                });
             }
         });
 
