@@ -10,11 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ui.PlayerView;
-
 import java.util.ArrayList;
 
 public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDataAdapter.ItemRowHolder> {
@@ -22,8 +17,6 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
     private ArrayList<SectionDataModel> dataList;
     private Context mContext;
     private RecyclerView.RecycledViewPool recycledViewPool;
-    private PlayerView playerView;
-    SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(mContext);
 
     public RecyclerViewDataAdapter(ArrayList<SectionDataModel> dataList, Context mContext) {
         this.dataList = dataList;

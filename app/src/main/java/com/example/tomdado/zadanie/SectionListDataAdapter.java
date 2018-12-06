@@ -10,14 +10,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.decoder.DecoderCounters;
+import com.google.android.exoplayer2.source.LoopingMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.video.VideoRendererEventListener;
+
 
 public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListDataAdapter.SingleItemRowHolder>{
 
@@ -27,6 +49,7 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
     private static final int TYPE_TWO = 2;
     private View viewSingleCard;
     private View viewSingleCardProfile;
+    private SimpleExoPlayer player;
 
     public SectionListDataAdapter(ArrayList<SingleItemModel> itemModels, Context mContext) {
         this.itemModels = itemModels;
@@ -68,6 +91,17 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                         .into(holder.imageView_post);
             }else{
 
+                DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(); //test
+
+                TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+                TrackSelector trackSelector =
+                        new DefaultTrackSelector(videoTrackSelectionFactory);
+
+                // 2. Create the player
+                player = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
+                holder.videoView_post.setUseController(false);
+                holder.videoView_post.requestFocus();
+                holder.videoView_post.setPlayer(player);
             }
 
         }
