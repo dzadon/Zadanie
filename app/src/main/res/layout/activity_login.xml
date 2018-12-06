@@ -50,6 +50,7 @@
                 android:id="@+id/buttonLogin"
                 android:text="SignIn"
                 android:layout_width="match_parent"
+                android:background="@drawable/logout_button_shape"
                 android:layout_height="wrap_content" />
 
             <TextView
