@@ -1,7 +1,9 @@
 package com.example.tomdado.zadanie;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,8 +32,9 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
         this.mContext = mContext;
     }
 
+    @NonNull
     @Override
-    public SingleItemRowHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SingleItemRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         viewSingleCard =LayoutInflater.from(parent.getContext()).inflate(R.layout.list_single_card, parent, false);
         viewSingleCardProfile = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_single_card_profile, parent, false);
@@ -40,12 +43,12 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_single_card, parent, false);
         }
-        SingleItemRowHolder singleItemRowHolder = new SingleItemRowHolder(view);
-        return singleItemRowHolder;
+        return new SingleItemRowHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(SingleItemRowHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SingleItemRowHolder holder, int position) {
         SingleItemModel itemModel = itemModels.get(position);
         if (itemModel.isProfileView()) {
             holder.postTextViewName.setText("Name " + itemModel.getAuthor());
@@ -55,12 +58,12 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
             holder.postAuthor.setText("Autor: " + itemModel.getAuthor());
             holder.postTime.setText("Dátum a čas: " + itemModel.getDateTimeOfPost());
             Glide.with(mContext)
-                    .load("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()) // or URI/path
-                    .apply(new RequestOptions()
-                            .fitCenter()
-                            .centerCrop()
-                    )
-                    .into(holder.imageView_post);
+                .load("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()) // or URI/path
+                .apply(new RequestOptions()
+                        .fitCenter()
+                        .centerCrop()
+                )
+                .into(holder.imageView_post);
         }
     }
 

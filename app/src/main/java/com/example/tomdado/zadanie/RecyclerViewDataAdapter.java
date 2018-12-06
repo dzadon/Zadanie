@@ -1,6 +1,7 @@
 package com.example.tomdado.zadanie;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
@@ -23,15 +24,15 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
         recycledViewPool = new RecyclerView.RecycledViewPool();
     }
 
+    @NonNull
     @Override
-    public ItemRowHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ItemRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        ItemRowHolder rowHolder = new ItemRowHolder(v);
-        return rowHolder;
+        return new ItemRowHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(ItemRowHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ItemRowHolder holder, int position) {
         ArrayList singleSectionItems = dataList.get(position).getAllItemInSection();
         SectionListDataAdapter adapter = new SectionListDataAdapter(singleSectionItems, mContext);
         holder.recyclerView.setHasFixedSize(true);

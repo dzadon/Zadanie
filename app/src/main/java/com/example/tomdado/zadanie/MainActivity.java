@@ -1,6 +1,7 @@
 package com.example.tomdado.zadanie;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -70,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
                 snapHelper.attachToRecyclerView(recyclerView);
             }
         });
-
-
     }
 
     public interface FirestoreCallback {
@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
                     SingleItemModel item = new SingleItemModel();
                     item.setProfileView(true);
                     item.setAuthor(document.getString("email"));
-                    DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                    Date date = document.getTimestamp("date").toDate();
+                    @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                    Date date = Objects.requireNonNull(document.getTimestamp("date")).toDate();
                     String datetime =  df.format(date);
                     item.setDateTimeOfRegistration(datetime);
                     item.setNumberOfPosts(Long.toString(document.getLong("numberOfPosts")));
@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity {
                             SingleItemModel item = new SingleItemModel();
                             item.setProfileView(false);
                             item.setUrl(document.getString("imageurl"));
-                            DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                            Date date = document.getTimestamp("date").toDate();
+                            @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                            Date date = Objects.requireNonNull(document.getTimestamp("date")).toDate();
                             String datetime =  df.format(date);
                             item.setDateTimeOfPost(datetime);
                             item.setAuthor(document.getString("username"));
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem){
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem){
                         SwitchClass switchClass = new SwitchClass();
                         finish();
                         startActivity(new Intent(getApplicationContext(),switchClass.getActivity(menuItem.getItemId())));

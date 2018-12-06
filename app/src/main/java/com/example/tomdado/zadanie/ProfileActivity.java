@@ -1,5 +1,6 @@
 package com.example.tomdado.zadanie;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener{
@@ -60,6 +62,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             DocumentReference docRef = db.collection("users").document(user.getUid());
             docRef.get()
                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @SuppressLint("SetTextI18n")
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             if(documentSnapshot.exists()){
@@ -68,8 +71,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                 textViewName.setText("Name: " + name);
                                 String numberOfPosts = Long.toString(documentSnapshot.getLong("numberOfPosts"));
                                 textViewNumberOfPosts.setText("Number of posts: " + numberOfPosts);
-                                DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-                                Date date = documentSnapshot.getTimestamp("date").toDate();
+                                @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                                Date date = Objects.requireNonNull(documentSnapshot.getTimestamp("date")).toDate();
                                 String regDatetime =  df.format(date);
                                 textViewRegDatetime.setText("DateTime of registration: " + regDatetime);
 
@@ -104,7 +107,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         SwitchClass switchClass = new SwitchClass();
                         finish();
                         startActivity(new Intent(getApplicationContext(),switchClass.getActivity(menuItem.getItemId())));
