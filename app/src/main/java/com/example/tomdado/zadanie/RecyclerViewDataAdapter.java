@@ -6,9 +6,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import java.util.ArrayList;
 
@@ -17,6 +22,8 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
     private ArrayList<SectionDataModel> dataList;
     private Context mContext;
     private RecyclerView.RecycledViewPool recycledViewPool;
+    private PlayerView playerView;
+    SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(mContext);
 
     public RecyclerViewDataAdapter(ArrayList<SectionDataModel> dataList, Context mContext) {
         this.dataList = dataList;
@@ -43,8 +50,23 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
         SnapHelper snapHelper = new PagerSnapHelper();
         holder.recyclerView.setOnFlingListener(null);
         snapHelper.attachToRecyclerView(holder.recyclerView);
-    }
+        holder.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                   //TODO
+                }
+                Log.d("SCROLL","onScrollStateChanged");
+            }
 
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                Log.d("SCROLL","onScrolled");
+            }
+        });
+    }
     @Override
     public int getItemCount() {
         return (null != dataList ? dataList.size() : 0);

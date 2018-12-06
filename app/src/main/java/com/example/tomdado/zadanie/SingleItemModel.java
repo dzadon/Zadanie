@@ -2,11 +2,18 @@ package com.example.tomdado.zadanie;
 
 public class SingleItemModel {
     private String author, url, dateTimeOfPost, numberOfPosts, dateTimeOfRegistration;
-    private boolean profileView;
+    private boolean profileView,image;
 
     public SingleItemModel() {
     }
 
+    public boolean isImage() {
+        return image;
+    }
+
+    public void setImage(boolean image) {
+        this.image = image;
+    }
 
     public String getAuthor() {
         return author;
