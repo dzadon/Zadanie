@@ -21,43 +21,55 @@
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
+            android:background="@color/colorAccent"
             android:orientation="vertical">
+
 
             <TextView
                 android:id="@+id/textViewProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Profile" />
+                android:layout_margin="20dp"
+                android:text="Profile"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:typeface="sans" />
 
             <TextView
                 android:id="@+id/textViewName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal" />
-
-            <TextView
-                android:id="@+id/textViewRegDatetime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal"
+                android:textSize="24sp"
+                android:typeface="monospace" />
 
             <TextView
                 android:id="@+id/textViewNumberOfPosts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal"
+                android:textSize="24sp"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/textViewRegDatetime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="14sp"
+                android:typeface="monospace" />
 
             <Button
                 android:id="@+id/buttonLogout"
-                android:textSize="20sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="15dp"
                 android:background="@drawable/logout_button_shape"
                 android:fadingEdge="none|horizontal|vertical"
-                android:text="Logout" />
+                android:text="Logout"
+                android:textSize="20sp" />
 
 
         </LinearLayout>

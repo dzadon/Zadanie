@@ -8,11 +8,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?android:selectableItemBackground"
+
+        android:background="@color/colorAccent"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/postTextViewProfile"
+            android:typeface="sans"
+            android:textStyle="bold"
+            android:layout_margin="20dp"
+            android:textSize="34sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -20,21 +25,29 @@
 
         <TextView
             android:id="@+id/postTextViewName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"/>
-
-        <TextView
-            android:id="@+id/postTextViewRegDatetime"
+            android:textSize="24sp"
+            android:typeface="monospace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"/>
 
         <TextView
             android:id="@+id/postTextViewNumberOfPosts"
+            android:textSize="24sp"
+            android:typeface="monospace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/postTextViewRegDatetime"
+            android:textSize="14sp"
+            android:typeface="monospace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"/>
+
+
 
     </LinearLayout>
 
