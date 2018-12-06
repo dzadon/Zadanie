@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -79,10 +82,10 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
             holder.postTextViewRegDatetime.setText("DateTime of registration " + itemModel.getDateTimeOfRegistration());
             holder.postTextViewNumberOfPosts.setText("Number of posts " + itemModel.getNumberOfPosts());
         } else {
-            holder.videoView_post.setVisibility(View.GONE);
             holder.postAuthor.setText("Autor: " + itemModel.getAuthor());
             holder.postTime.setText("Dátum a čas: " + itemModel.getDateTimeOfPost());
             if(itemModel.isImage()){
+                holder.videoView_post.setVisibility(View.GONE);
                 Glide.with(mContext)
                         .load("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()) // or URI/path
                         .apply(new RequestOptions()
@@ -103,6 +106,19 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                 holder.videoView_post.setUseController(false);
                 holder.videoView_post.requestFocus();
                 holder.videoView_post.setPlayer(player);
+
+
+                DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
+                        Util.getUserAgent(mContext, "Zadanie"), bandwidthMeter);
+
+
+                DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+                MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()));
+
+                player.prepare(videoSource);
+                player.setPlayWhenReady(true);
+
             }
 
         }

@@ -50,13 +50,11 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
                 if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
                    //TODO
                 }
-                Log.d("SCROLL","onScrollStateChanged");
             }
 
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                Log.d("SCROLL","onScrolled");
             }
         });
     }
