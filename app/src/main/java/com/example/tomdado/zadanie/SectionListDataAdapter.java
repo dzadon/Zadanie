@@ -79,6 +79,7 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
             holder.postTextViewRegDatetime.setText("DateTime of registration " + itemModel.getDateTimeOfRegistration());
             holder.postTextViewNumberOfPosts.setText("Number of posts " + itemModel.getNumberOfPosts());
         } else {
+            holder.videoView_post.setVisibility(View.GONE);
             holder.postAuthor.setText("Autor: " + itemModel.getAuthor());
             holder.postTime.setText("Dátum a čas: " + itemModel.getDateTimeOfPost());
             if(itemModel.isImage()){
@@ -90,7 +91,7 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                         )
                         .into(holder.imageView_post);
             }else{
-
+                holder.imageView_post.setVisibility(View.GONE);
                 DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(); //test
 
                 TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
