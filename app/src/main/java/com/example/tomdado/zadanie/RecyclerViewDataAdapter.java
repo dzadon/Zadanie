@@ -54,10 +54,9 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                /*if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
-
-                    play(getPlayTargetPosition());
-                }*/
+                if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                   //TODO
+                }
                 Log.d("SCROLL","onScrollStateChanged");
             }
 
@@ -68,7 +67,6 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
             }
         });
     }
-
     @Override
     public int getItemCount() {
         return (null != dataList ? dataList.size() : 0);

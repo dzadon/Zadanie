@@ -106,6 +106,11 @@ public class MainActivity extends AppCompatActivity {
                             String datetime =  df.format(date);
                             item.setDateTimeOfPost(datetime);
                             item.setAuthor(document.getString("username"));
+                            if(document.getString("type") == "image"){
+                                item.setImage(true);
+                            }else{
+                                item.setImage(true);
+                            }
                             posts.add(item);
                         }
 

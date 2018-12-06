@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -57,13 +58,18 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
         } else {
             holder.postAuthor.setText("Autor: " + itemModel.getAuthor());
             holder.postTime.setText("Dátum a čas: " + itemModel.getDateTimeOfPost());
-            Glide.with(mContext)
-                .load("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()) // or URI/path
-                .apply(new RequestOptions()
-                        .fitCenter()
-                        .centerCrop()
-                )
-                .into(holder.imageView_post);
+            if(itemModel.isImage()){
+                Glide.with(mContext)
+                        .load("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()) // or URI/path
+                        .apply(new RequestOptions()
+                                .fitCenter()
+                                .centerCrop()
+                        )
+                        .into(holder.imageView_post);
+            }else{
+
+            }
+
         }
     }
 
@@ -92,12 +98,14 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
         protected TextView postTextViewName;
         protected TextView postTextViewRegDatetime;
         protected TextView postTextViewNumberOfPosts;
+        protected PlayerView videoView_post;
 
         public SingleItemRowHolder(View itemView) {
             super(itemView);
             this.postAuthor = itemView.findViewById(R.id.postAuthor);
             this.postTime = itemView.findViewById(R.id.postTime);
             this.imageView_post = itemView.findViewById(R.id.imageView_post);
+            this.videoView_post = itemView.findViewById(R.id.videoView_post);
             this.postTextViewName = itemView.findViewById(R.id.postTextViewName);
             this.postTextViewRegDatetime = itemView.findViewById(R.id.postTextViewRegDatetime);
             this.postTextViewNumberOfPosts = itemView.findViewById(R.id.postTextViewNumberOfPosts);
