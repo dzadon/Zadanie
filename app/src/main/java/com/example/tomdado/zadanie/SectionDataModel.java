@@ -9,10 +9,6 @@ public class SectionDataModel {
     public SectionDataModel() {
     }
 
-    public SectionDataModel(ArrayList<SingleItemModel> allItemInSection) {
-        this.allItemInSection = allItemInSection;
-    }
-
     public ArrayList<SingleItemModel> getAllItemInSection() {
         return allItemInSection;
     }

@@ -4,17 +4,13 @@ package com.example.tomdado.zadanie;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -34,7 +30,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +54,6 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("ACTIVITY","ACTIVITY UPLOAD");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_file);
         setNavigationView();
@@ -92,7 +86,6 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
             finish();
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         }
-        Log.d("NUMBER OF POSTS",String.valueOf(numberOfPosts));
         numberOfPosts= numberOfPosts + 1;
         Map<String, Object> data = new HashMap<>();
         data.put("numberOfPosts", numberOfPosts);
@@ -118,24 +111,24 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
         db.collection("posts").add(post);
 
         docRef.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if(documentSnapshot.exists()){
-                            Crashlytics.log("UploadFile activity - document exists");
-                            Long numberOfPosts = documentSnapshot.getLong("numberOfPosts");
-                           updateUser(numberOfPosts);
-                        }else{
-                            Crashlytics.log("UploadFile activity - document doesnt exist");
-                        }
+            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if(documentSnapshot.exists()){
+                        Crashlytics.log("UploadFile activity - document exists");
+                        Long numberOfPosts = documentSnapshot.getLong("numberOfPosts");
+                       updateUser(numberOfPosts);
+                    }else{
+                        Crashlytics.log("UploadFile activity - document doesnt exist");
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Crashlytics.logException(e);
-                    }
-                });
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Crashlytics.logException(e);
+                }
+            });
     }
 
     private void uploadFile(){
@@ -148,39 +141,38 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
         }
 
         Ion.with(UploadFileActivity.this)
-                .load("POST",urlUpload)
-                .setMultipartFile("upfile", mimeType, uploadVideo)
-                .asString()
-                .setCallback(new FutureCallback<String>() {
-                    @Override
-                    public void onCompleted(Exception ex, String response) {
-                        try {
-                            JSONObject jObj = new JSONObject(response);
-                            String status = jObj.getString("status");
-                            Toast.makeText(getApplicationContext(), "resp: " + response, Toast.LENGTH_LONG).show();
-                            Crashlytics.log("Upload file " + "response: " + response);
-                            if (status.equals("ok")) {
-                                //ulozit do DB
-                                if(!switchMimeType(mimeType).equals("")){
-                                    saveToDb(jObj.getString("message"),switchMimeType(mimeType));
-                                    Toast.makeText(getApplicationContext(), "ok: " + response, Toast.LENGTH_LONG).show();
-                                }
-                                else {
-                                    Crashlytics.log("Nepodporovany typ suboru");
-                                    Toast.makeText(getApplicationContext(), "Nepodporovany typ suboru", Toast.LENGTH_LONG).show();
-                                }
-
+            .load("POST",urlUpload)
+            .setMultipartFile("upfile", mimeType, uploadVideo)
+            .asString()
+            .setCallback(new FutureCallback<String>() {
+                @Override
+                public void onCompleted(Exception ex, String response) {
+                    try {
+                        JSONObject jObj = new JSONObject(response);
+                        String status = jObj.getString("status");
+                        Toast.makeText(getApplicationContext(), "resp: " + response, Toast.LENGTH_LONG).show();
+                        Crashlytics.log("Upload file " + "response: " + response);
+                        if (status.equals("ok")) {
+                            //ulozit do DB
+                            if(!switchMimeType(mimeType).equals("")){
+                                saveToDb(jObj.getString("message"),switchMimeType(mimeType));
+                                Toast.makeText(getApplicationContext(), "ok: " + response, Toast.LENGTH_LONG).show();
                             }
-                        }
-                        catch(JSONException e) {
-                            e.printStackTrace();
-                            Crashlytics.logException(e);
-                            Toast.makeText(getApplicationContext(), "JSON error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            else {
+                                Crashlytics.log("Nepodporovany typ suboru");
+                                Toast.makeText(getApplicationContext(), "Nepodporovany typ suboru", Toast.LENGTH_LONG).show();
+                            }
+
                         }
                     }
-                });
+                    catch(JSONException e) {
+                        e.printStackTrace();
+                        Crashlytics.logException(e);
+                        Toast.makeText(getApplicationContext(), "JSON error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
     }
-
 
     @Override
     public void onClick(View view){
@@ -210,8 +202,6 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                             .into(imageView); //imageview to set thumbnail to
                 }
                 else {
-                    //imageView.setImageURI(fileURI);
-                    //Picasso.get().load(fileURI).fit().centerCrop().into(imageView);
                     Glide.with(getApplicationContext())
                             .load(fileURI) // or URI/path
                             .apply(new RequestOptions()

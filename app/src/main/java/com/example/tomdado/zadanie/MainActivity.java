@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db = FirebaseFirestore.getInstance();
-        Log.d("ACTIVITY","ACTIVITY MAIN");
         checkPermissions();
         setNavigationView();
         allSampleData = new ArrayList<>();
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                             String datetime =  df.format(date);
                             item.setDateTimeOfPost(datetime);
                             item.setAuthor(document.getString("username"));
-                            if(document.getString("type").equals("image")){
+                            if(Objects.equals(document.getString("type"), "image")){
                                 item.setImage(true);
                             }else{
                                 item.setImage(false);

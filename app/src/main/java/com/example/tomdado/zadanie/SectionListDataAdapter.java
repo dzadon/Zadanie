@@ -5,46 +5,31 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-
-import java.util.ArrayList;
-
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.video.VideoRendererEventListener;
+
+import java.util.ArrayList;
 
 
 public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListDataAdapter.SingleItemRowHolder>{
@@ -98,6 +83,7 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                         .into(holder.imageView_post);
             }else{
                 holder.imageView_post.setVisibility(View.GONE);
+                holder.setIsRecyclable(false);
                 DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(); //test
 
                 TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
@@ -105,7 +91,7 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                         new DefaultTrackSelector(videoTrackSelectionFactory);
 
                 // 2. Create the player
-                player = VideoPlayer.getInstance(mContext); //ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
+                player = VideoPlayer.getInstance(mContext);
                 holder.videoView_post.setUseController(false);
                 holder.videoView_post.requestFocus();
                 holder.videoView_post.setPlayer(player);
@@ -118,7 +104,6 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                         .createMediaSource(Uri.parse("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()));
 
                 holder.videoView_post.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
-                holder.setIsRecyclable(false);
 
                 player.prepare(videoSource);
                 player.setPlayWhenReady(true);
@@ -126,13 +111,13 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                 holder.videoView_post.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        if(player.getPlayWhenReady()){
-                            player.setPlayWhenReady(false);
-                        }
-                        else {
-                            player.setPlayWhenReady(true);
-                        }
-                        return false;
+                    if(player.getPlayWhenReady()){
+                        player.setPlayWhenReady(false);
+                    }
+                    else {
+                        player.setPlayWhenReady(true);
+                    }
+                    return false;
                     }
                 });
             }

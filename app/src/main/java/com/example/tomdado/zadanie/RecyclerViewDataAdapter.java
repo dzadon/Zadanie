@@ -6,10 +6,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import java.util.ArrayList;
 
 public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDataAdapter.ItemRowHolder> {
@@ -35,6 +35,7 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
     public void onBindViewHolder(@NonNull ItemRowHolder holder, int position) {
         ArrayList singleSectionItems = dataList.get(position).getAllItemInSection();
         SectionListDataAdapter adapter = new SectionListDataAdapter(singleSectionItems, mContext);
+        holder.setIsRecyclable(false);
         holder.recyclerView.setHasFixedSize(true);
         holder.recyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
         holder.recyclerView.setAdapter(adapter);
@@ -43,21 +44,6 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
         SnapHelper snapHelper = new PagerSnapHelper();
         holder.recyclerView.setOnFlingListener(null);
         snapHelper.attachToRecyclerView(holder.recyclerView);
-        holder.setIsRecyclable(false);
-        holder.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                 //
-                }
-            }
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
     }
     @Override
     public int getItemCount() {
