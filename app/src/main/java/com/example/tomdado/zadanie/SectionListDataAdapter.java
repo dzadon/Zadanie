@@ -16,6 +16,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -35,6 +36,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -102,15 +104,13 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                         new DefaultTrackSelector(videoTrackSelectionFactory);
 
                 // 2. Create the player
-                player = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
+                player = VideoPlayer.getInstance(mContext); //ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
                 holder.videoView_post.setUseController(false);
                 holder.videoView_post.requestFocus();
                 holder.videoView_post.setPlayer(player);
 
-
                 DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
                         Util.getUserAgent(mContext, "Zadanie"), bandwidthMeter);
-
 
                 DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
                 MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
@@ -119,6 +119,8 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                 player.prepare(videoSource);
                 player.setPlayWhenReady(true);
 
+                holder.videoView_post.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+                holder.setIsRecyclable(false);
             }
 
         }

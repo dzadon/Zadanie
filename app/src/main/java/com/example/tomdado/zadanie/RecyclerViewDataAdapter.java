@@ -43,12 +43,13 @@ public class RecyclerViewDataAdapter extends RecyclerView.Adapter<RecyclerViewDa
         SnapHelper snapHelper = new PagerSnapHelper();
         holder.recyclerView.setOnFlingListener(null);
         snapHelper.attachToRecyclerView(holder.recyclerView);
+        holder.setIsRecyclable(false);
         holder.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
-                   //TODO
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                 //
                 }
             }
 
