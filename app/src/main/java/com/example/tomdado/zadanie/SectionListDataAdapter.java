@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -75,7 +76,7 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
         return new SingleItemRowHolder(view);
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "ClickableViewAccessibility"})
     @Override
     public void onBindViewHolder(@NonNull SingleItemRowHolder holder, int position) {
         SingleItemModel itemModel = itemModels.get(position);
@@ -116,11 +117,24 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
                 MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                         .createMediaSource(Uri.parse("http://mobv.mcomputing.eu/upload/v/"+ itemModel.getUrl()));
 
+                holder.videoView_post.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+                holder.setIsRecyclable(false);
+
                 player.prepare(videoSource);
                 player.setPlayWhenReady(true);
 
-                holder.videoView_post.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
-                holder.setIsRecyclable(false);
+                holder.videoView_post.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if(player.getPlayWhenReady()){
+                            player.setPlayWhenReady(false);
+                        }
+                        else {
+                            player.setPlayWhenReady(true);
+                        }
+                        return false;
+                    }
+                });
             }
 
         }

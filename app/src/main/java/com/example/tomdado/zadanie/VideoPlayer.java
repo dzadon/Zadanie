@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -48,17 +49,14 @@ public class VideoPlayer{
 
                 @Override
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                    if (playWhenReady && playbackState == Player.STATE_READY) {
-                        // media actually playing
-                    } else if (playWhenReady) {
-                        // might be idle (plays after prepare()),
-                        // buffering (plays when data available)
-                        // or ended (plays when seek away from end)
-                    } else {
-                        // player paused in any state
-                        player.setPlayWhenReady(true);
-                    }
 
+                    switch(playbackState) {
+                        case ExoPlayer.STATE_ENDED:
+                            player.seekTo(0);
+                            break;
+                        default:
+                            break;
+                    }
                 }
 
                 @Override
@@ -73,7 +71,7 @@ public class VideoPlayer{
 
                 @Override
                 public void onPlayerError(ExoPlaybackException error) {
-
+                    Crashlytics.logException(error);
                 }
 
                 @Override
