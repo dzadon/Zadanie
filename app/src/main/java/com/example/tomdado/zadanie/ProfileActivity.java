@@ -35,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseFirestore db;
     private TextView textViewName;
     private TextView textViewRegDatetime;
+    private TextView textViewRegText;
     private TextView textViewNumberOfPosts;
     private DrawerLayout mDrawerLayout;
 
@@ -47,6 +48,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         setNavigationView();
         textViewName = findViewById(R.id.textViewName);
         textViewRegDatetime = findViewById(R.id.textViewRegDatetime);
+        textViewRegText= findViewById(R.id.textViewRegText);
         textViewNumberOfPosts = findViewById(R.id.textViewNumberOfPosts);
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -74,7 +76,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                 @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
                                 Date date = Objects.requireNonNull(documentSnapshot.getTimestamp("date")).toDate();
                                 String regDatetime =  df.format(date);
-                                textViewRegDatetime.setText("DateTime of registration: " + regDatetime);
+                                textViewRegText.setText("DateTime of registration: ");
+                                textViewRegDatetime.setText(regDatetime);
 
                             }else{
                                 Crashlytics.log("Profile activity - document doesnt exist");

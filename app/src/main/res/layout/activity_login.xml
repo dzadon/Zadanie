@@ -16,11 +16,13 @@
 
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:background="@android:color/holo_green_light"
+            android:orientation="vertical">
+
 
             <TextView
                 android:id="@+id/textViewLogin"
@@ -30,35 +32,35 @@
                 android:text="User Login" />
 
             <EditText
-                android:layout_margin="15dp"
-                android:inputType="textEmailAddress"
-                android:hint="Enter your email"
                 android:id="@+id/editTextEmail"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:hint="Enter your email"
+                android:inputType="textEmailAddress" />
 
             <EditText
-                android:layout_margin="15dp"
-                android:inputType="textPassword"
-                android:hint="Enter your password"
                 android:id="@+id/editTextPassword"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:hint="Enter your password"
+                android:inputType="textPassword" />
 
             <Button
-                android:layout_margin="15dp"
                 android:id="@+id/buttonLogin"
-                android:text="SignIn"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
                 android:background="@drawable/logout_button_shape"
-                android:layout_height="wrap_content" />
+                android:text="SignIn" />
 
             <TextView
-                android:textAlignment="center"
-                android:text="Not have an account? Signup here"
                 android:id="@+id/textViewSignup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Not have an account? Signup here"
+                android:textAlignment="center" />
 
         </LinearLayout>
 
