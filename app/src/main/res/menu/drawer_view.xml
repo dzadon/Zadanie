@@ -3,12 +3,23 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/navUploadFile"
-            android:title="Upload File" />
+            android:title="Upload File"
+            android:icon="@drawable/upload"
+            />
         <item
             android:id="@+id/navProfile"
-            android:title="Profile" />
+            android:title="Profile"
+            android:icon="@drawable/profile"
+            />
         <item
             android:id="@+id/navPosts"
-            android:title="Posts" />
+            android:title="Posts"
+            android:icon="@drawable/posts"
+            />
+        <item
+            android:id="@+id/navLogout"
+            android:title="Logout"
+            android:icon="@drawable/logout"
+            />
     </group>
 </menu>

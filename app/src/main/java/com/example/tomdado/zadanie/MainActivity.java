@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,10 +18,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -47,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     final List<SingleItemModel> posts = new ArrayList<>();
     final Map<String,SingleItemModel> authors = new HashMap<>();
+    private Integer changesCounter = 0;
+    private ImageView refresh_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
                 snapHelper.attachToRecyclerView(recyclerView);
             }
         });
+
+
     }
 
     public interface FirestoreCallback {
@@ -99,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                         for (QueryDocumentSnapshot document : QueryDocumentSnapshots) {
                             SingleItemModel item = new SingleItemModel();
                             item.setProfileView(false);
-                            item.setUrl(document.getString("imageurl"));
+
                             @SuppressLint("SimpleDateFormat") DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
                             Date date = Objects.requireNonNull(document.getTimestamp("date")).toDate();
                             String datetime =  df.format(date);
@@ -107,8 +118,10 @@ public class MainActivity extends AppCompatActivity {
                             item.setAuthor(document.getString("username"));
                             if(Objects.equals(document.getString("type"), "image")){
                                 item.setImage(true);
+                                item.setUrl(document.getString("imageurl"));
                             }else{
                                 item.setImage(false);
+                                item.setUrl(document.getString("videourl"));
                             }
                             posts.add(item);
                         }
@@ -126,15 +139,47 @@ public class MainActivity extends AppCompatActivity {
                             }
                             dm.setAllItemInSection(singleItemModels);
                             allSampleData.add(dm);
+
                         }
+                        db.collection("posts")
+                                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                                        @Nullable FirebaseFirestoreException e) {
+                                        if (e != null) {
+                                            Crashlytics.log("Listen failed.");
+                                            return;
+                                        }
+
+                                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                                                changesCounter++;
+                                                if(changesCounter > 1){
+                                                    refresh_btn = (ImageView) findViewById(R.id.refresh_btn);
+                                                    refresh_btn.setVisibility(View.VISIBLE);
+                                                    refresh_btn.setOnClickListener(new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View v) {
+                                                            finish();
+                                                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                                        }
+                                                    });
+
+                                                }
+                                                break;
+
+
+                                            }
+                                        }
+
+
+                                    }
+                                });
                         firestoreCallback.onCallback(allSampleData);
                     }
                 });
-
-
             }
         });
-
     }
 
     private void setNavigationView(){

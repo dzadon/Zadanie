@@ -70,17 +70,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
         firebaseAuth.signInWithEmailAndPassword(email,password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            finish();
-                            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
-                        }else{
-                            Toast.makeText(LoginActivity.this,"Could not login",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    finish();
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                }else{
+                    Toast.makeText(LoginActivity.this,"Could not login",Toast.LENGTH_SHORT).show();
+                }
+                }
+            });
 
     }
 

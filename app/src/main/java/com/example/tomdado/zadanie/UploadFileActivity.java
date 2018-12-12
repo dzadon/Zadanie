@@ -80,7 +80,7 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
         startActivityForResult(gallery,1);
     }
 
-    private void updateUser(long numberOfPosts){
+    private void updateUser(@NonNull long numberOfPosts){
         FirebaseUser firebaseUser= firebaseAuth.getCurrentUser();
         if(firebaseUser == null){
             finish();
@@ -106,8 +106,17 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
         post.put("username", firebaseUser.getEmail());
         post.put("date", Calendar.getInstance().getTime() );
         post.put("userid", firebaseUser.getUid());
-        post.put("imageurl", fileName);
         post.put("type",type);
+
+        if(type.equals("image")){
+            post.put("imageurl", fileName);
+            post.put("videourl", "");
+        }
+        else {
+            post.put("videourl", fileName);
+            post.put("imageurl", "");
+        }
+
         db.collection("posts").add(post);
 
         docRef.get()
@@ -116,8 +125,12 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     if(documentSnapshot.exists()){
                         Crashlytics.log("UploadFile activity - document exists");
-                        Long numberOfPosts = documentSnapshot.getLong("numberOfPosts");
-                       updateUser(numberOfPosts);
+                        try{
+                            Long numberOfPosts = documentSnapshot.getLong("numberOfPosts");
+                            updateUser(numberOfPosts);
+                        } catch (@NonNull Exception e){
+                            Crashlytics.logException(e);
+                        }
                     }else{
                         Crashlytics.log("UploadFile activity - document doesnt exist");
                     }
@@ -150,19 +163,20 @@ public class UploadFileActivity extends AppCompatActivity implements View.OnClic
                     try {
                         JSONObject jObj = new JSONObject(response);
                         String status = jObj.getString("status");
-                        Toast.makeText(getApplicationContext(), "resp: " + response, Toast.LENGTH_LONG).show();
                         Crashlytics.log("Upload file " + "response: " + response);
                         if (status.equals("ok")) {
-                            //ulozit do DB
                             if(!switchMimeType(mimeType).equals("")){
                                 saveToDb(jObj.getString("message"),switchMimeType(mimeType));
-                                Toast.makeText(getApplicationContext(), "ok: " + response, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Upload successful!", Toast.LENGTH_LONG).show();
                             }
                             else {
-                                Crashlytics.log("Nepodporovany typ suboru");
-                                Toast.makeText(getApplicationContext(), "Nepodporovany typ suboru", Toast.LENGTH_LONG).show();
+                                Crashlytics.log("Unsupported file type");
+                                Toast.makeText(getApplicationContext(), "Unsupported file type", Toast.LENGTH_LONG).show();
                             }
-
+                        }
+                        else {
+                            Crashlytics.log("Upload failed");
+                            Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_LONG).show();
                         }
                     }
                     catch(JSONException e) {
